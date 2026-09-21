@@ -1,0 +1,324 @@
+{
+  "topics": [
+    {
+      "slug": "java-8-21",
+      "title": "Java 8–21",
+      "blurb": "Language and runtime features interviewers expect a Java lead to use with judgment.",
+      "cards": [
+        {
+          "id": "java-1",
+          "question": "What is the difference between a class, an object, and a method in Java?",
+          "answer": "A class is a blueprint, an object is an instance created from that blueprint, and a method is behavior defined on a class. For example, Order is a class, one customer order is an object, and calculateTotal() is a method."
+        },
+        {
+          "id": "java-2",
+          "question": "What is the difference between == and .equals() in Java?",
+          "answer": "For objects, == compares whether two references point to the same object, while .equals() compares value equality when the class implements it. Use .equals() for strings and other values, and use Objects.equals() when either value may be null."
+        },
+        {
+          "id": "java-3",
+          "question": "How do you store and retrieve values from a List and a Map?",
+          "answer": "A List stores ordered values and is accessed by numeric index, such as names.get(0). A Map stores key-value pairs and is accessed by key, such as users.get(userId). Choose based on whether position or lookup key is the important relationship."
+        },
+        {
+          "id": "java-4",
+          "question": "What is the difference between checked and unchecked exceptions?",
+          "answer": "Checked exceptions must be handled or declared, while unchecked exceptions extend RuntimeException and usually represent programming errors or invalid state. Handle errors where you can recover, and do not catch exceptions just to hide them."
+        },
+        {
+          "id": "java-5",
+          "question": "What does static mean in Java, and when would you use it?",
+          "answer": "static members belong to the class rather than one object. Use static for constants and stateless utility methods, but avoid putting mutable application state in static fields because it is hard to test and share safely."
+        }
+      ]
+    },
+    {
+      "slug": "oop",
+      "title": "OOP",
+      "blurb": "Object design the way a lead defends it in reviews and interviews.",
+      "cards": [
+        {
+          "id": "oop-1",
+          "question": "Explain encapsulation as a lead would: not “private fields,” but a design goal.",
+          "answer": "Encapsulation hides invariants and change. The object decides how state is mutated and which combinations are legal. Private fields are a mechanism; the goal is a small public surface that cannot put the object in an invalid state. In interviews, mention validation in constructors, immutable snapshots, and avoiding anemic getters/setters that leak the model to every layer."
+        },
+        {
+          "id": "oop-2",
+          "question": "When is inheritance the right tool, and when is composition safer?",
+          "answer": "Inheritance is for true is-a relationships with stable behavior reuse and polymorphism. It is fragile when subclasses override to skip invariants (LSP breaks) or when you inherit for code reuse only. Prefer composition: wrap a collaborator and delegate. As a lead, default to composition, use interfaces for polymorphism, and keep inheritance shallow (framework templates, sealed hierarchies)."
+        },
+        {
+          "id": "oop-3",
+          "question": "What does polymorphism buy you in a Spring service layer?",
+          "answer": "Callers depend on an interface (PaymentGateway, NotificationPort) so you can swap Stripe vs sandbox, or sync vs async, without changing business flow. It enables testing with fakes and keeps feature flags at the composition root. Polymorphism is wasted if every implementation is a thin wrapper around the same if-else. Design one behavior contract, then vary implementations."
+        },
+        {
+          "id": "oop-4",
+          "question": "State the Liskov Substitution Principle and give a Java example of violating it.",
+          "answer": "Subtypes must be usable wherever the parent is expected without surprising the caller. Violation: a Rectangle with setWidth/setHeight and a Square that forces equal sides—callers setting width then height get wrong area. Another: overriding save() to throw UnsupportedOperationException on a read-only repository subtype. Fix by splitting interfaces (read vs write) rather than lying with inheritance."
+        },
+        {
+          "id": "oop-5",
+          "question": "Abstract class vs interface in modern Java (8+): how do you choose?",
+          "answer": "Interfaces define capability (what you can do), can have default methods, and support multiple implementation. Abstract classes own shared state and a partial implementation of a single lineage. Prefer interfaces for API boundaries and ports. Use an abstract class when several types share fields and a template method. After Java 8, “abstract class just for default methods” is usually the wrong reason."
+        }
+      ]
+    },
+    {
+      "slug": "software-design",
+      "title": "Software Design",
+      "blurb": "Architecture and design trade-offs you will be asked to own as a lead.",
+      "cards": [
+        {
+          "id": "sd-1",
+          "question": "Walk through SOLID as a set of review comments, not a memorized list.",
+          "answer": "SRP: this class changes for two reasons—split policy from I/O. OCP: new payment type should not edit a switch of 12 cases—use a registry/strategy. LSP: this subclass throws on a parent method—split the contract. ISP: clients should not depend on a fat interface they do not use. DIP: domain should not import the SQL driver—depend on a port, implement the adapter. Quote a real smell, then the principle."
+        },
+        {
+          "id": "sd-2",
+          "question": "Coupling vs cohesion: how do you spot a module that will hurt the team in six months?",
+          "answer": "Low cohesion: a “Utils” or “Manager” that mixes auth, dates, and HTTP. High coupling: every change to orders requires touching billing, email, and the controller. Healthy modules have one reason to change and talk through narrow APIs. As a lead, watch package cycles, shared mutable statics, and a single “common” library that becomes a dumping ground."
+        },
+        {
+          "id": "sd-3",
+          "question": "What is hexagonal (ports and adapters) architecture, and when is it overkill?",
+          "answer": "The domain sits in the center; inbound adapters (HTTP, messaging) and outbound adapters (DB, HTTP clients) implement ports. You can test use cases without Spring MVC or a real database. It is overkill for a tiny CRUD app with one table. It pays off when you have real business rules, multiple entry points, or you expect to change persistence/messaging. Start with clear service boundaries even if the folders are not fully hexagonal."
+        },
+        {
+          "id": "sd-4",
+          "question": "How do you decide between a modular monolith and microservices for a new product?",
+          "answer": "Default to a modular monolith: one deployable, modules with clear APIs, separate schemas if needed. Split a service when you have an independent scale, release, or failure domain, and a team that can own the ops. Microservices cost network failure modes, distributed transactions, and platform work. Interview signal: you can describe the modular monolith’s package rules and a later extract based on a real bottleneck, not fashion."
+        },
+        {
+          "id": "sd-5",
+          "question": "Name three design patterns you would actually use in a Java backend, and one you would challenge in a PR.",
+          "answer": "Use: Strategy (payment/pricing), Adapter (external API), Template Method or a small pipeline for a fixed workflow. Factory or Builder when construction is complex. Challenge: Singleton for everything (hides dependencies; Spring already manages lifetime), God AbstractFactory pyramids, and Observer when a simple domain event or Spring event would do. Patterns should reduce duplication or isolate change, not add types for their own sake."
+        }
+      ]
+    },
+    {
+      "slug": "spring",
+      "title": "Spring & Spring Boot",
+      "blurb": "The framework questions that separate users from leads who can debug production.",
+      "cards": [
+        {
+          "id": "spring-1",
+          "question": "Explain IoC and dependency injection as they actually work in Spring.",
+          "answer": "You declare beans; the container constructs the graph and injects collaborators (constructor injection preferred). IoC means your code does not new up infrastructure. Constructor injection makes dependencies required and testable. Field injection hides them and complicates tests. As a lead: no circular dependencies, no lookup of the ApplicationContext from business code, and @ComponentScan kept tight so startup stays predictable."
+        },
+        {
+          "id": "spring-2",
+          "question": "What does @Transactional actually do, and what are the classic pitfalls?",
+          "answer": "It starts a proxy around the method: begin/commit/rollback, usually tying a JDBC connection to the thread. Pitfalls: self-invocation bypasses the proxy (this.method() is not transactional), checked exceptions do not roll back by default, lazy loading after the transaction ends (LazyInitializationException), and long transactions holding DB locks. Put transactions on the service use-case, keep them short, and never do HTTP calls inside one."
+        },
+        {
+          "id": "spring-3",
+          "question": "How does Spring Boot auto-configuration work, and how would you debug “it worked locally”?",
+          "answer": "Auto-config classes are conditional on classpath, properties, and existing beans (@ConditionalOnClass, @ConditionalOnMissingBean). Starters pull dependencies that flip those conditions. Debug with --debug / ConditionEvaluationReport, spring-boot-actuator /beans, and by checking which autoconfig was excluded. Leads also pin versions via the BOM, avoid duplicate starters, and document required properties so environments do not silently skip a DataSource."
+        },
+        {
+          "id": "spring-4",
+          "question": "Bean scopes: when is singleton wrong, and what is request scope for?",
+          "answer": "Default singleton is right for stateless services. It is wrong if the bean holds request-specific mutable state (user, tenant) without a ThreadLocal strategy you fully control. Request/session scopes are for web-bound objects; injecting them into a singleton needs a proxy. Prototype is rare; prefer creating a strategy object per call. Interviewers want you to say: keep beans stateless; put state in method args, persistence, or a clearly scoped holder."
+        },
+        {
+          "id": "spring-5",
+          "question": "How would you structure exception handling and validation in a Spring REST API?",
+          "answer": "Validate at the edge with @Valid and Bean Validation. Map domain errors to Problem Details (RFC 7807) via @ControllerAdvice. Do not leak stack traces. Distinguish 400 (client/validation), 404, 409 (conflict/idempotency), 422 if you use it consistently, and 500 for unexpected. Log with a correlation id. Keep advice from swallowing errors that should page on-call. For security, never return “user exists” vs “wrong password” in a way that enables enumeration unless product requires it."
+        }
+      ]
+    },
+    {
+      "slug": "aws",
+      "title": "AWS",
+      "blurb": "Cloud choices a backend lead should explain in trade-offs, not product names.",
+      "cards": [
+        {
+          "id": "aws-1",
+          "question": "EC2 vs ECS/Fargate vs Lambda: how do you choose for a Spring Boot API?",
+          "answer": "EC2: max control, you own patching and scaling. ECS/Fargate: container the same artifact you run locally, less OS toil, good default for most Spring APIs. Lambda: great for spiky, short, event-driven work; watch cold starts, connection pooling to RDS, and 15-minute limits. For a long-lived Spring app with JDBC, Fargate/ECS (or EKS if you already run Kubernetes) is the usual lead recommendation unless the workload is truly event-sized."
+        },
+        {
+          "id": "aws-2",
+          "question": "How do you design S3 + IAM so the app is least-privilege?",
+          "answer": "Buckets private by default, block public access, encryption at rest, versioning if you need recoverability. The app role gets s3:GetObject/PutObject on a prefix, not * on *. Prefer CloudFront or signed URLs for user downloads instead of public objects. Separate prod/non-prod buckets and accounts. Never put long-lived access keys in the repo; use task roles (ECS) or instance/IRSA roles."
+        },
+        {
+          "id": "aws-3",
+          "question": "RDS vs DynamoDB: what questions do you ask before picking?",
+          "answer": "Do we have relational integrity, ad-hoc query, and transactions across entities? → RDS (Postgres). Do we have a known access pattern, huge scale, and single-digit ms at high throughput? → DynamoDB, but you must design keys first. Leads also ask about ops skill, backup/PITR, and cost at expected RCU/WCU vs instance size. Mixing both is fine: RDS for core domain, Dynamo for a high-scale lookup if access patterns are clear."
+        },
+        {
+          "id": "aws-4",
+          "question": "SQS vs SNS vs EventBridge: which would you use for “order placed” fan-out?",
+          "answer": "SNS (or EventBridge) publishes; each consumer gets its own SQS queue subscribed so they can fail and retry independently. Direct SQS is point-to-point competing consumers—one work queue. EventBridge shines for many SaaS/AWS sources, schema registry, and content-based routing. As a lead: make consumers idempotent, set DLQs, and do not use SNS-to-email as your transaction log."
+        },
+        {
+          "id": "aws-5",
+          "question": "What does a production-ready VPC look like for a private Spring API talking to RDS?",
+          "answer": "Public subnets: load balancer (and NAT if needed). Private subnets: app tasks and RDS, no public IPs. Security groups: ALB → app port, app → RDS 5432, nothing else. RDS in isolated subnets, Multi-AZ for prod. NAT for outbound patches/APIs; lock egress if compliance requires. Flow logs and no 0.0.0.0/0 on SSH; use SSM Session Manager. Interviewers want the subnet and SG story, not just “we used a VPC.”"
+        }
+      ]
+    },
+    {
+      "slug": "sql",
+      "title": "SQL",
+      "blurb": "Query and data-model questions that show you can keep a system fast and correct.",
+      "cards": [
+        {
+          "id": "sql-1",
+          "question": "How do B-tree indexes help, and when does an index hurt?",
+          "answer": "A B-tree index speeds equality and range lookups and can support ORDER BY if it matches the key. It hurts writes (extra maintenance), storage, and can be ignored if the query is not sargable (function on the column, leading wildcard). Composite indexes are leftmost-prefix. As a lead: measure with EXPLAIN, index foreign keys used in joins, and drop unused indexes. Partial/filtered indexes help skewed data."
+        },
+        {
+          "id": "sql-2",
+          "question": "What is the N+1 query problem in JPA/Hibernate, and how do you fix it?",
+          "answer": "You load N parents, then each lazy association triggers another query. Fixes: join fetch (carefully, watch cartesian products), @EntityGraph, batch fetching, or a dedicated query/DTO projection. Do not Open-Session-in-View as a silent fix for production. Leads look at SQL logs in tests and prefer explicit queries for list endpoints instead of navigating a lazy graph in a loop."
+        },
+        {
+          "id": "sql-3",
+          "question": "Name isolation levels and a bug each one still allows.",
+          "answer": "Read Uncommitted: dirty reads (rarely used). Read Committed (Postgres default): no dirty reads, but non-repeatable reads and lost updates unless you add locks/optimistic versions. Repeatable Read: phantom reads in some DBs (Postgres RR is snapshot-like). Serializable: fewest anomalies, more retries under contention. For checkout/inventory, talk optimistic version columns or SELECT FOR UPDATE, not just “we use transactions.”"
+        },
+        {
+          "id": "sql-4",
+          "question": "Normalize vs denormalize: how do you decide for an order history table?",
+          "answer": "Normalize to 3NF while the write model must stay consistent (prices, tax rules, inventory). Denormalize or snapshot for read models: store line item description and unit price on the order line at purchase time so later catalog edits do not rewrite history. Warehouses and search indexes are denormalized copies. The lead answer: transactional truth vs query-shaped copies, with a clear owner of each."
+        },
+        {
+          "id": "sql-5",
+          "question": "What do you look for in EXPLAIN ANALYZE when a list endpoint is slow?",
+          "answer": "Seq scan on a large table that should be indexed, nested loop with a huge inner row count, sorts that spill to disk, and row estimates far from actual (stale stats). Check filters that cannot use indexes. Then: right index, rewrite JOIN vs IN, pagination with keyset instead of OFFSET on deep pages, and avoid SELECT *. Confirm in staging with production-like data volume, not 20 rows locally."
+        }
+      ]
+    },
+    {
+      "slug": "system-design",
+      "title": "System Design",
+      "blurb": "Suggested topic: how a lead scopes, scales, and failure-proofs a backend.",
+      "cards": [
+        {
+          "id": "sys-1",
+          "question": "How do you structure a 45-minute system design interview as the candidate?",
+          "answer": "Clarify users, QPS, data size, consistency, and what “success” means. Draw a simple request path first (client → API → DB). Then deepen one bottleneck: cache, queue, search, or multi-region. Call out trade-offs (consistency vs availability), failure modes, and observability. Leave 5 minutes for scale numbers. Leads narrate decisions: “I’d ship the monolith, then split X because of Y load.”"
+        },
+        {
+          "id": "sys-2",
+          "question": "Where would you put a cache for a product catalog, and what can go wrong?",
+          "answer": "CDN for public pages, Redis for hot keys (product by id), maybe local Caffeine for ultra-hot immutable config. Wrongs: stale prices, cache stampede on expiry, caching user-specific data under a global key, unbounded memory, and treating cache as source of truth. Use TTLs plus invalidation on writes, request coalescing, and versioned keys. State whether slightly stale reads are acceptable."
+        },
+        {
+          "id": "sys-3",
+          "question": "Why must write APIs be idempotent, and how do you implement it?",
+          "answer": "Clients retry; networks duplicate. Without idempotency, you double-charge or double-create orders. Use an Idempotency-Key from the client, store key → request hash + response, and replay on retry. For consumers, use a processed-event table keyed by event id. PUT and deletes are naturally more idempotent than naive POST. Combine with unique constraints so the database is the last line of defense."
+        },
+        {
+          "id": "sys-4",
+          "question": "How would you design observability for a Spring service you own?",
+          "answer": "Structured logs with correlation/trace id, metrics (latency histograms, error rate, saturation), and traces (OpenTelemetry) across HTTP and DB. RED/USE methods. Alert on user-facing SLOs, not CPU by itself. Health checks: liveness vs readiness (don’t take traffic if DB is down). As a lead, you also define runbooks and who gets paged. Logs are not a substitute for metrics on high-QPS paths."
+        },
+        {
+          "id": "sys-5",
+          "question": "How do you handle a downstream timeout without cascading failure?",
+          "answer": "Set explicit timeouts and bounded retries with jitter; never retry non-idempotent POSTs blindly. Bulkheads/thread limits so one dependency cannot exhaust the pool. Circuit breaker after sustained errors; fallback only if it is safe (cached read, degrade feature). Queue work that can be async. Load-test the failure, not only the happy path. Interviewers want timeouts named as a first-class design, not an afterthought."
+        }
+      ]
+    },
+    {
+      "slug": "leadership",
+      "title": "Leadership & Delivery",
+      "blurb": "Suggested topic: the people and process questions that actually get lead offers.",
+      "cards": [
+        {
+          "id": "lead-1",
+          "question": "A senior engineer is blocking a release with endless polish. How do you handle it?",
+          "answer": "Separate quality bar from gold-plating. Restate the user risk, the deadline, and a written MVC. Invite them to list must-fix defects vs nice-to-haves; time-box the musts. If they are right about risk, you change the date or scope—you do not silently ship a known incident. Follow up in a 1:1 on influence vs control. Interviewers want respect for craft plus a decision, not a pep talk."
+        },
+        {
+          "id": "lead-2",
+          "question": "What does a good 1:1 look like when you lead engineers?",
+          "answer": "Their agenda first: blockers, growth, morale. You bring career path, feedback, and context from above. Not a status meeting—that belongs in standup/tickets. Track follow-ups. For quieter people, prepare prompts. For strong ICs, talk scope and influence, not task lists. Confidentiality and psychological safety matter; you still escalate ethics/safety issues. Cadence is weekly unless you both agree otherwise."
+        },
+        {
+          "id": "lead-3",
+          "question": "Production is down. What do you do in the first 15 minutes as the engineering lead?",
+          "answer": "Declare an incident, one incident commander, a comms channel, and a scribe. Mitigate first (rollback, feature flag, scale, failover), then diagnose. Update stakeholders on impact and next checkpoint, not root cause guesses. Keep the room small. After mitigation: blameless timeline, action items with owners, and a fix for the detection gap. You protect people from blame theater while still demanding facts."
+        },
+        {
+          "id": "lead-4",
+          "question": "How do you give critical feedback that actually changes behavior?",
+          "answer": "Be timely and specific: situation, behavior, impact, request. Example: “In yesterday’s design review you interrupted twice; the intern stopped proposing. Please let them finish, then challenge the idea.” Private first. Ask for their view. Follow up. Do not sandwich so hard the message disappears. Document patterns. Praise in public when it is real. Feedback is a system, not a once-a-year surprise."
+        },
+        {
+          "id": "lead-5",
+          "question": "How do you hire a mid-level backend engineer so the bar stays consistent?",
+          "answer": "Scorecard tied to the role: coding, debugging, Java/Spring depth, communication, collaboration. Structured interviews, same prompts, independent notes, then a debrief that fights halo/horn effects. Work sample close to the job (read a PR, fix a failing test) over trivia. Sell the team honestly. Watch for bias in “culture fit”—replace with “culture add” and evidenced values. A no on values is a no even if they code well."
+        }
+      ]
+    },
+    {
+      "slug": "concurrency",
+      "title": "Concurrency",
+      "blurb": "Suggested topic: threads, safety, and the bugs that show up under load.",
+      "cards": [
+        {
+          "id": "conc-1",
+          "question": "What does “happens-before” mean for a Java lead reviewing a race?",
+          "answer": "The JMM defines when a write is guaranteed visible to another thread. Synchronization, volatile, locks, and concurrent utilities create happens-before edges. Without them, a thread can see stale fields forever. Review for unsynchronized shared mutable state, lazy init without safe publication, and “it works on my machine” because of x86. Prefer immutability and confinement over clever volatiles."
+        },
+        {
+          "id": "conc-2",
+          "question": "synchronized vs ReentrantLock vs concurrent collections: how do you choose?",
+          "answer": "synchronized: simple critical sections, intrinsic locks, good default. ReentrantLock: timed tryLock, multiple conditions, fairness when you truly need it. Concurrent collections (ConcurrentHashMap, queues) for common patterns without a coarse lock. Don’t lock around I/O. Don’t use ConcurrentHashMap and then compound non-atomic check-then-act without compute/merge. Measure contention; split locks or shard if needed."
+        },
+        {
+          "id": "conc-3",
+          "question": "How do you prevent a thread-pool exhaustion outage in a Spring app?",
+          "answer": "Bound pools (Tomcat, async, JDBC). Never unbounded queues for production executors without a policy. Timeouts on downstream calls so threads return. Separate pools for different dependencies (bulkhead). Monitor queue depth and pool utilization. Virtual threads reduce the “ran out of platform threads” class of issues but you can still deadlock on a limited lock or pin carriers. Load-test slow dependency behavior."
+        },
+        {
+          "id": "conc-4",
+          "question": "What is a deadlock, and how would you diagnose one in production?",
+          "answer": "Two or more threads wait on locks the others hold—circular wait. Diagnose with jstack / thread dump, jcmd Thread.print, or a profiler; look for BLOCKED threads and lock owners. Fix by lock ordering, smaller critical sections, tryLock with timeout, or removing nested locks. Deadlocks can also be DB row locks (check pg_locks). As a lead, add a runbook: dump threads, dump DB locks, roll forward or bounce only as last resort."
+        },
+        {
+          "id": "conc-5",
+          "question": "CompletableFuture vs a message queue: when is each the right async tool?",
+          "answer": "CompletableFuture (or virtual-thread blocking) is in-process: fan-out HTTP, compose I/O in one request, timeouts. It dies with the JVM and is not a durable workflow. A queue (SQS) is for work that must survive crashes, be retried, or be processed by another service. Don’t fake a job system with fire-and-forget futures. Don’t use a queue when the user is waiting on the same HTTP request unless you poll or push status."
+        }
+      ]
+    },
+    {
+      "slug": "testing-quality",
+      "title": "Testing & Quality",
+      "blurb": "Suggested topic: how a lead uses tests as a design and delivery tool.",
+      "cards": [
+        {
+          "id": "test-1",
+          "question": "What is the test pyramid you would actually enforce on a Spring team?",
+          "answer": "Many fast unit tests for domain and pure logic. Fewer slice tests (@WebMvcTest, @DataJpaTest) for adapters. A small set of Testcontainers integration tests for the real SQL and messaging contract. A handful of E2E against a deployed env for critical journeys. Reject 200 end-to-end tests that take 40 minutes and still miss the bug. Contract tests (OpenAPI/Pact) where multiple teams share APIs."
+        },
+        {
+          "id": "test-2",
+          "question": "What makes a unit test valuable vs brittle?",
+          "answer": "Valuable tests specify behavior and invariants: given this input, the discount is X; invalid state is rejected. Brittle tests assert on Mockito call order, private methods, or HTML structure of a JSON field name that is not part of the contract. Don’t mock the class under test. Prefer fakes over heavy mocks for repositories when the logic is interesting. Name tests as the behavior, not the methodName_withStuff."
+        },
+        {
+          "id": "test-3",
+          "question": "How do you test @Transactional rollback and concurrency bugs?",
+          "answer": "Integration tests with a real DB (Testcontainers): assert a failed use-case leaves no partial rows. For isolation/lost updates, two transactions in a test with latches, or a stress test that asserts a unique constraint. You cannot unit-test rollback by mocking EntityManager and hoping. Also test the proxy pitfall: calling @Transactional from another bean, not this. Flaky concurrency tests need retries documented or they get ignored."
+        },
+        {
+          "id": "test-4",
+          "question": "What is your bar for a pull request as a software engineering lead?",
+          "answer": "Small, one intent, tests for the risk, observability if it can fail in prod, and a rollback story. Review design and correctness first, style later (let the linter fight formatting). Ask “how would this break?” not “I would have named it differently.” You still block on security, data loss, and missing indexes on new query paths. Cycle time matters: review same day, don’t let PRs rot."
+        },
+        {
+          "id": "test-5",
+          "question": "Feature flags vs branches: how do you ship safely on main?",
+          "answer": "Trunk-based with short-lived branches. Incomplete features hide behind flags (or dark launches). Flags need an owner, expiry, and cleanup or they become permanent complexity. Combine with incremental schema changes (expand/contract) so you can roll forward. Don’t use flags as a substitute for tests. Interviewers like expand/contract migrations: add column, dual-write, switch reads, drop old."
+        }
+      ]
+    }
+  ]
+}
